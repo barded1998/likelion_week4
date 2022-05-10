@@ -1,68 +1,60 @@
 import express from 'express';
 
-let nextId = 4; // posts 변수에 id를 설정합니다
-
-let posts = [
-	// posts 배열
-	{
-		// posts[0]
-		id: 1,
-		title: 'Avengers',
-	},
-	{
-		// posts [1]
-		id: 2,
-		title: 'Spider-man',
-	},
-	{
-		// posts [2]
-		id: 3,
-		title: 'Harry Potter',
-	},
-];
+let posts = [];
 
 const router = express.Router();
 
 //GET /api/posts - 글 목록 조회
 router.get('/', (req, res) => {
-	return res.status(200).json(posts);
-});
-
-//GET /api/posts/:postId - 글 개별 항목 조회
-router.get('/:postId', (req, res) => {
-	const postId = parseInt(req.params.postId);
-	const post = posts.find((post) => post.id === postId);
-	if (post) {
-		return res.status(200).json(post);
+	const postId = parseInt(req.body.id);
+	if (postId) {
+		const post = posts.find((p) => p.id === postId);
+		if (!post) {
+			return res.status(404).json({ error: 'Post does not exist' });
+		}
+		return res.status(200).json({ data: post });
 	}
-	return res.sendStatus(404);
+	return res.status(200).json({ data: posts });
 });
 
 // POST /api/posts - 글 생성
 router.post('/', (req, res) => {
-	const title = req.body.title;
-	const post = { id: nextId++, title };
+	const postId = parseInt(req.body.id);
+	const content = req.body.content;
+	const post = { id: postId, content, userId: 1 };
 	posts = [...posts, post];
-	return res.status(201).json(post);
+	return res.status(201).json({ data: { post: { id: postId } } });
 });
 
-// PUT /api/posts/:postId - 특정 글 수정
-router.put('/:postId', (req, res) => {
-	const postId = parseInt(req.params.postId);
-	const title = req.body.title;
+// PUT /api/posts - 특정 글 수정
+router.put('/', (req, res) => {
+	const userId = parseInt(req.body.userId);
+	const content = req.body.content;
+	const postId = parseInt(req.body.postId);
 	const post = posts.find((p) => p.id === postId);
-	if (post) {
-		post.title = title;
-		return res.status(200).json(post);
+	if (!post) {
+		return res.status(404).json({ error: 'Cannot find post' });
 	}
-	return res.sendStatus(404);
+	if (userId !== post.userId) {
+		return res.status(403).json({ error: 'Cannot modify post' });
+	}
+	post.content = content;
+	return res.status(200).json({ data: { id: post.id } });
 });
 
-// DELETE /api/posts/:postId - 특정 글 삭제
-router.delete('/:postId', (req, res) => {
-	const postId = parseInt(req.params.postId);
+// DELETE /api/posts - 특정 글 삭제
+router.delete('/', (req, res) => {
+	const userId = parseInt(req.body.userId);
+	const postId = parseInt(req.body.postId);
+	const post = posts.find((p) => p.id === postId);
+	if (!post) {
+		return res.status(404).json({ error: 'Cannot find post' });
+	}
+	if (userId !== post.userId) {
+		return res.status(403).json({ error: 'Cannot delete post' });
+	}
 	posts = posts.filter((p) => p.id !== postId);
-	return res.sendStatus(204);
+	return res.status(200).json({ data: 'Successfully deleted' });
 });
 
 export default router;
