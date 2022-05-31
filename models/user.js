@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize');
-
+import { Sequelize } from 'sequelize';
 export default class User extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
@@ -9,7 +8,7 @@ export default class User extends Sequelize.Model {
           allowNull: false,
         },
         password: {
-          type: Sequelize.STRING(30),
+          type: Sequelize.STRING(200),
           allowNull: false,
         },
       },

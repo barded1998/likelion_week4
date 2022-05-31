@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
 import Post from './post.js';
 import User from './user.js';
 
@@ -23,4 +23,4 @@ User.associate(db);
 Post.associate(db);
 db.sequelize = sequelize;
 
-module.exports = db;
+export default db;

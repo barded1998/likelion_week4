@@ -1,5 +1,5 @@
-const Sequelize = require('sequelize');
-
+// const Sequelize = require('sequelize');
+import { Sequelize } from 'sequelize';
 export default class Post extends Sequelize.Model {
   static init(sequelize) {
     return super.init(

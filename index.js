@@ -1,12 +1,14 @@
 import express from 'express';
 import api from './api/api.js';
+import dotevn from 'dotenv';
+import db from './models/index.js';
+
+dotevn.config();
 
 const app = express();
 const port = 8080;
 
-const { sequelize } = require('./models');
-
-sequelize
+db.sequelize
   .sync({ force: false })
   .then(() => {
     console.log('데이터베이스 연결 성공');

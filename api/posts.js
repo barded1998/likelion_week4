@@ -20,7 +20,7 @@ router.get('/:postId', async (req, res) => {
 
 // POST /api/posts - 글 생성
 router.post('/', async (req, res) => {
-  const userId = req.headers['x-user-id'];
+  const userId = req.decoded.id;
   const content = req.body.content;
   const post = await postRepository.create(content, userId);
   return res.status(201).json({ data: { post: { id: post.id } } });
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 
 // PUT /api/posts/:postId - 특정 글 수정
 router.put('/:postId', async (req, res) => {
-  const userId = req.headers['x-user-id'];
+  const userId = req.decoded.id;
   const postId = req.params.postId;
   const content = req.body.content;
   const post = await postRepository.getByPostId(postId);
@@ -44,7 +44,7 @@ router.put('/:postId', async (req, res) => {
 
 // DELETE /api/posts/:postId - 특정 글 삭제
 router.delete('/:postId', async (req, res) => {
-  const userId = req.headers['x-user-id'];
+  const userId = req.decoded.id;
   const postId = req.params.postId;
   const post = await postRepository.getByPostId(postId);
   if (!post) {
@@ -53,7 +53,7 @@ router.delete('/:postId', async (req, res) => {
   if (userId != post.userId) {
     return res.status(403).json({ error: 'Cannot delete post' });
   }
-  postRepository.remove(post.id);
+  await postRepository.remove(post.id);
   return res.status(200).json({ data: 'Successfully deleted' });
 });
 
