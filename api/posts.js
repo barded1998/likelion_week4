@@ -1,15 +1,22 @@
 import express from 'express';
+import cors from 'cors';
 import * as postRepository from '../db/post.js';
-
 const router = express.Router();
+
+const corsOptions = {
+  origin: 'http://localhost:4000',
+};
 
 //GET /api/posts - 글 목록 조회
 router.get('/', async (req, res) => {
-  return res.status(200).json({ data: await postRepository.getAll() });
+  return res
+    .header('Access-Control-Allow-Origin', 'http://localhost:4000')
+    .status(200)
+    .json({ data: await postRepository.getAll() });
 });
 
 //GET /api/posts/:postId - 특정 글 조회
-router.get('/:postId', async (req, res) => {
+router.get('/:postId', cors(corsOptions), async (req, res) => {
   const postId = req.params.postId;
   const post = await postRepository.getByPostId(postId);
   if (!post) {
@@ -19,7 +26,7 @@ router.get('/:postId', async (req, res) => {
 });
 
 // POST /api/posts - 글 생성
-router.post('/', async (req, res) => {
+router.post('/', cors(corsOptions), async (req, res) => {
   const userId = req.decoded.id;
   const content = req.body.content;
   const post = await postRepository.create(content, userId);
@@ -27,7 +34,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/posts/:postId - 특정 글 수정
-router.put('/:postId', async (req, res) => {
+router.put('/:postId', cors(corsOptions), async (req, res) => {
   const userId = req.decoded.id;
   const postId = req.params.postId;
   const content = req.body.content;
@@ -43,7 +50,7 @@ router.put('/:postId', async (req, res) => {
 });
 
 // DELETE /api/posts/:postId - 특정 글 삭제
-router.delete('/:postId', async (req, res) => {
+router.delete('/:postId', cors(corsOptions), async (req, res) => {
   const userId = req.decoded.id;
   const postId = req.params.postId;
   const post = await postRepository.getByPostId(postId);

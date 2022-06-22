@@ -6,8 +6,7 @@ import db from './models/index.js';
 dotevn.config();
 
 const app = express();
-const port = 8080;
-
+const port = 3000;
 db.sequelize
   .sync({ force: false })
   .then(() => {
@@ -18,6 +17,7 @@ db.sequelize
   });
 
 app.use(express.json());
+
 app.use('/api', api);
 
 app.listen(port);
